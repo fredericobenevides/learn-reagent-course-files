@@ -17,12 +17,3 @@
   (onValue (db-ref path)
            (fn [snapshot]
              (reset! state/gigs (js->clj (.val snapshot) :keywordize-keys true)))))
-
-(comment
-  ;; test
-  (set (ref (getDatabase) "users/ada") (clj->js {:last "lovelace"}))
-
-  ;; or with thread first
-  (-> (getDatabase)
-      (ref "users/ada")
-      (set (clj->js {:last "lovelace"}))))

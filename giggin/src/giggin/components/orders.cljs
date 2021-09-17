@@ -18,7 +18,6 @@
   (let [remove-from-order #(swap! state/orders dissoc %)
         remove-all-orders #(reset! state/orders {})]
     [:aside
-     [admin-panel]
      (if (empty? @state/orders)
        [:div.empty
         [:div.title "You don't have any orders"]
@@ -26,22 +25,23 @@
        [:div.order
         [:div.body
          (for [[id quant] @state/orders]
-           [:div.item {:key id}
-            [:div.img
-             [:img {:src (get-in @state/gigs [id :img])
-                    :alt (get-in @state/gigs [id :title])}]]
-            [:div.content
-             (if (get-in @state/gigs [id :sold-out])
-               [:p.sold-out "Sold out"]
-               [:p.title (str (get-in @state/gigs [id :title]) " \u00D7 " quant)])]
-            [:div.action
-             (if (get-in @state/gigs [id :sold-out])
-               [:div.price (format-price 0)]
-               [:div.price (format-price (* (get-in @state/gigs [id :price]) quant))])
-             [:button.btn.btn--link.tooltip
-              {:data-tooltip "Remove"
-               :on-click #(remove-from-order id)}
-              [:i.icon.icon--cross]]]])]
+           (let [gig (id @state/gigs)]
+             [:div.item {:key id}
+              [:div.img
+               [:img {:src (:img gig)
+                      :alt (:title gig)}]]
+              [:div.content
+               (if (:sold-out gig)
+                 [:p.sold-out "Sold out"]
+                 [:p.title (:title gig) " \u00D7 " quant])]
+              [:div.action
+               (if (:sold-out gig)
+                 [:div.price (format-price 0)]
+                 [:div.price (format-price (* (:price gig) quant))])
+               [:button.btn.btn--link.tooltip
+                {:data-tooltip "Remove"
+                 :on-click #(remove-from-order id)}
+                [:i.icon.icon--cross]]]]))]
         [:div.total
          [:hr]
          [:div.item
