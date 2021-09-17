@@ -3,7 +3,8 @@
             [giggin.helpers :refer [format-price]]
             [giggin.components.gig-editor :refer [gig-editor]]
             [reagent.core :as r]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [giggin.fb.db :refer [db-save!]]))
 
 (defn gigs
   []
@@ -16,12 +17,13 @@
                        (swap! modal assoc :active active)
                        (reset! values gig))
         upsert-gig (fn [{:keys [id title desc price img sold-out]}]
-                     (swap! state/gigs assoc id {:id (or id (str "gig-" (random-uuid)))
-                                                 :title (str/trim title)
-                                                 :desc (str/trim desc)
-                                                 :img (str/trim img)
-                                                 :price (js/parseInt price)
-                                                 :sold-out sold-out})
+                     (let [id (or id (str "gig-" (random-uuid)))]
+                       (db-save! ["gigs" id] #js {:id id
+                                                  :title (str/trim title)
+                                                  :desc (str/trim desc)
+                                                  :img (str/trim img)
+                                                  :price (js/parseInt price)
+                                                  :sold-out sold-out}))
                      (toggle-modal {:active false :gig initial-values}))]
     (fn
       []

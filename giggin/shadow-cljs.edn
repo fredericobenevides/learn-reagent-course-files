@@ -2,7 +2,8 @@
 
  :dependencies [[binaryage/devtools "0.9.10"]
                 [proto-repl "0.3.1"]
-                [reagent "0.8.0"]]
+                [reagent "0.8.0"]
+                [cljs-ajax "0.8.4"]]
 
  :nrepl        {:port 3333}
 
@@ -14,6 +15,8 @@
         :modules
         {:main
          {:entries [giggin.core]}}
+
+        :js-options {:babel-preset-config {:targets {"chrome" "80"}}}
 
         :devtools
         {:after-load  giggin.core/main
