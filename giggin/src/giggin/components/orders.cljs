@@ -7,7 +7,10 @@
 (defn total
   []
   (->> @state/orders
-       (map (fn [[id quant]] (* quant (get-in @state/gigs [id :price]))))
+       (map (fn [[id quant]]
+              (if (get-in @state/gigs [id :sold-out])
+                0
+                (* quant (get-in @state/gigs [id :price])))))
        (reduce +)))
 
 (defn orders
@@ -28,9 +31,13 @@
              [:img {:src (get-in @state/gigs [id :img])
                     :alt (get-in @state/gigs [id :title])}]]
             [:div.content
-             [:p.title (str (get-in @state/gigs [id :title]) " \u00D7 " quant)]]
+             (if (get-in @state/gigs [id :sold-out])
+               [:p.sold-out "Sold out"]
+               [:p.title (str (get-in @state/gigs [id :title]) " \u00D7 " quant)])]
             [:div.action
-             [:div.price (format-price (* (get-in @state/gigs [id :price]) quant))]
+             (if (get-in @state/gigs [id :sold-out])
+               [:div.price (format-price 0)]
+               [:div.price (format-price (* (get-in @state/gigs [id :price]) quant))])
              [:button.btn.btn--link.tooltip
               {:data-tooltip "Remove"
                :on-click #(remove-from-order id)}
